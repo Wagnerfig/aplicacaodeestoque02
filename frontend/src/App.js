@@ -201,7 +201,25 @@ const RegisterForm = ({ onRegister, onToggleLogin }) => {
       return;
     }
     
+    if (password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+    
     try {
+      // Check if user already exists
+      const existingUsers = await dbOperation('users', 'getAll');
+      const userExists = existingUsers.find(u => u.username === username || u.email === email);
+      
+      if (userExists) {
+        if (userExists.username === username) {
+          setError('Nome de usuário já existe');
+        } else {
+          setError('Email já está em uso');
+        }
+        return;
+      }
+      
       const user = {
         id: generateId(),
         username,
@@ -211,12 +229,14 @@ const RegisterForm = ({ onRegister, onToggleLogin }) => {
       };
       
       await dbOperation('users', 'add', user);
+      console.log('User created successfully:', user.id);
       onRegister(user);
     } catch (error) {
+      console.error('Registration error:', error);
       if (error.name === 'ConstraintError') {
         setError('Usuário já existe');
       } else {
-        setError('Erro ao criar conta');
+        setError('Erro ao criar conta: ' + error.message);
       }
     }
   };
