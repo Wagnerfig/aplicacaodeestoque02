@@ -108,11 +108,7 @@ const LoginForm = ({ onLogin, onToggleRegister }) => {
     setError('');
     
     try {
-      const db = await initDB();
-      const transaction = db.transaction(['users'], 'readonly');
-      const store = transaction.objectStore('users');
-      const users = await store.getAll();
-      
+      const users = await dbOperation('users', 'getAll');
       const user = users.find(u => u.username === username && u.password === password);
       
       if (user) {
@@ -121,6 +117,7 @@ const LoginForm = ({ onLogin, onToggleRegister }) => {
         setError('Usuário ou senha inválidos');
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError('Erro ao fazer login');
     }
   };
