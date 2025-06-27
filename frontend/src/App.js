@@ -48,20 +48,33 @@ const dbOperation = async (storeName, operation, data = null) => {
   const transaction = db.transaction([storeName], operation === 'get' || operation === 'getAll' ? 'readonly' : 'readwrite');
   const store = transaction.objectStore(storeName);
   
-  switch (operation) {
-    case 'add':
-      return store.add(data);
-    case 'put':
-      return store.put(data);
-    case 'get':
-      return store.get(data);
-    case 'getAll':
-      return store.getAll();
-    case 'delete':
-      return store.delete(data);
-    default:
-      throw new Error('Invalid operation');
-  }
+  return new Promise((resolve, reject) => {
+    let request;
+    
+    switch (operation) {
+      case 'add':
+        request = store.add(data);
+        break;
+      case 'put':
+        request = store.put(data);
+        break;
+      case 'get':
+        request = store.get(data);
+        break;
+      case 'getAll':
+        request = store.getAll();
+        break;
+      case 'delete':
+        request = store.delete(data);
+        break;
+      default:
+        reject(new Error('Invalid operation'));
+        return;
+    }
+    
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 };
 
 // Utility functions
