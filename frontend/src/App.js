@@ -19,7 +19,7 @@ const initDB = () => {
       if (!db.objectStoreNames.contains('items')) {
         const itemsStore = db.createObjectStore('items', { keyPath: 'id' });
         itemsStore.createIndex('name', 'name', { unique: false });
-        itemsStore.createIndex('code', 'code', { unique: true });
+        itemsStore.createIndex('code', 'code', { unique: false }); // Changed to false to avoid conflicts
       }
       
       // Movements store
@@ -32,7 +32,8 @@ const initDB = () => {
       // Users store
       if (!db.objectStoreNames.contains('users')) {
         const usersStore = db.createObjectStore('users', { keyPath: 'id' });
-        usersStore.createIndex('username', 'username', { unique: true });
+        usersStore.createIndex('username', 'username', { unique: false }); // Changed to false to avoid conflicts
+        usersStore.createIndex('email', 'email', { unique: false });
       }
       
       // Settings store
